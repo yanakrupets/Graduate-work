@@ -1,13 +1,20 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using CafeApp.Data;
+using Microsoft.EntityFrameworkCore;
+using CafeApp.Data.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services
+    .AddDbContext<CafeDbContext>(opt =>
+    {
+        opt.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+    })
+    .AddScoped<IUnitOfWork, UnitOfWork<CafeDbContext>>()
+    .AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 
 var app = builder.Build();
 

@@ -1,0 +1,59 @@
+﻿@page "/dishes/create"
+@using CafeApp.Data.Interfaces;
+@using DIPLOM.Data.DB.Models;
+
+<div class="row">
+    <div class="col-lg-9">
+        <h1>Create</h1>
+    </div>
+    <div class="col-lg-3 text-right">
+        <a class="btn btn-secondary btn-sm" href="/dishes" role="button">Go Back To List</a>
+    </div>
+</div>
+
+@if (Dish != null)
+{
+    <EditForm Model="@Dish" OnValidSubmit="@Submit" >
+        <div class="form-group">
+            <label>DishName</label>
+            <InputText class="form-control" @bind-Value="Dish.DishName" />
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <InputNumber class="form-control" @bind-Value="Dish.Price" />
+        </div>
+        <div class="form-group">
+            <label>Info</label>
+            <InputTextArea class="form-control" @bind-Value="Dish.Info" />
+        </div>
+        <div class="form-group">
+            <label>Image</label>
+            <InputText class="form-control" @bind-Value="Dish.DishImage" />
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </EditForm>
+}
+
+@code {
+    [Inject]
+    protected IUnitOfWork UnitOfWork { get; set; }
+
+    public IRepository<Dish> Repository { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    public Dish Dish { get; set; }
+
+    private async void Submit()
+    {
+        await Repository.Create(Dish);
+        NavigationManager.NavigateTo("/dishes");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Repository = UnitOfWork.GetRepository<Dish>();
+        Dish = new Dish();
+    }
+}

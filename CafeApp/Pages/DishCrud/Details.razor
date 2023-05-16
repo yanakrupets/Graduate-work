@@ -1,0 +1,55 @@
+﻿@page "/dishes/detail/{id:int}"
+@using CafeApp.Data.Interfaces;
+@using DIPLOM.Data.DB.Models;
+
+@if (Dish != null)
+{
+    <div class="row">
+        <div class="col-lg-9">
+            <h1>@Dish.DishName</h1>
+        </div>
+        <div class="col-lg-3 text-right">
+            <a class="btn btn-secondary btn-sm" href="/dishes" role="button">Go Back To List</a>
+        </div>
+    </div>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">Name</th>
+                <td>@Dish.DishName</td>
+            </tr>
+            <tr>
+                <th scope="row">Info</th>
+                <td>@Dish.Info</td>
+            </tr>
+            <tr>
+                <th scope="row">Price</th>
+                <td>@Dish.Price</td>
+            </tr>
+            <tr>
+                <th scope="row">Image</th>
+                <td><img src="@Dish.DishImage" /></td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+
+@code {
+    [Inject]
+    protected IUnitOfWork UnitOfWork { get; set; }
+
+    public IRepository<Dish> Repository { get; set; }
+
+    public Dish Dish { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Repository = UnitOfWork.GetRepository<Dish>();
+        Dish = await Repository.GetById(Id);
+    }
+}
