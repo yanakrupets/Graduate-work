@@ -1,0 +1,57 @@
+﻿@page "/login"
+@using CafeApp.Data.Interfaces;
+@using DIPLOM.Data.DB.Models;
+@using Microsoft.EntityFrameworkCore;
+
+<div>
+    <div class="form-group">
+        <label>Role</label>
+        <InputSelect @bind-Value="ChoosenRole">
+                @foreach (var role in Roles)
+                {
+                    <option value="@role.Id">@role.UserRole</option>
+                }
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <InputText class="form-control" type="password" @bind-Value="Password"></InputText>
+    </div>
+    <div hidden="!@IsWrongPassword">Wrong Password</div>
+    <button type="button" @onclick="Submit" class="btn btn-primary">Login</button>
+</div>
+
+@code {
+    [Inject]
+    public IUnitOfWork UnitOfWork { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    public IRepository<Role> Repository { get; set; }
+
+    public List<Role> Roles { get; set; }
+
+    public void Submit()
+    {
+        var role = Roles.SingleOrDefault(r => r.Id == ChoosenRole && r.UserPassword == Password);
+        if (role == null)
+        {
+            IsWrongPassword = true;
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/{role.UserRole}");
+        }
+    }
+
+    public int ChoosenRole { get; set; }
+    public string Password { get; set; } = "";
+    public bool IsWrongPassword { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Repository = UnitOfWork.GetRepository<Role>();
+        Roles = Repository.Get().ToList();
+    }
+}
